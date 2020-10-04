@@ -1,4 +1,5 @@
 package com.example.demoJWT;
+
 /*******************************************************
  * For Vietnamese readers:
  *    Các bạn thân mến, mình rất vui nếu project này giúp 
@@ -8,9 +9,9 @@ package com.example.demoJWT;
  *    Xin cảm ơn!
  *******************************************************/
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,59 +32,67 @@ import com.example.demoJWT.user.User;
 import com.example.demoJWT.user.UserRepository;
 import com.example.demoJWT.user.UserService;
 
-
 /**
- * Copyright 2019 {@author Loda} (https://loda.me).
- * This project is licensed under the MIT license.
+ * Copyright 2019 {@author Loda} (https://loda.me). This project is licensed
+ * under the MIT license.
  *
- * @since 5/1/2019
- * Github: https://github.com/loda-kun
+ * @since 5/1/2019 Github: https://github.com/loda-kun
  */
 @RestController
 @RequestMapping("/api")
 public class LodaRestController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+	@Autowired
+	AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
-    
-    @Autowired
-    private UserRepository userrepo;
-    
-    @Autowired
-    PasswordEncoder passwordEncoder;
+	@Autowired
+	private JwtTokenProvider tokenProvider;
 
-    @PostMapping("/login")
-    public LoginResponse authenticateUser( @RequestBody LoginRequest loginRequest) {
+	@Autowired
+	private UserRepository userrepo;
 
-        // Xác thực thông tin người dùng Request lên
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
-        // Nếu không xảy ra exception tức là thông tin hợp lệ
-        // Set thông tin authentication vào Security Context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+	@PostMapping("/login")
+	public LoginResponse authenticateUser(@RequestBody LoginRequest loginRequest) {
 
-        // Trả về jwt cho người dùng.
-        String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
-        return new LoginResponse(jwt);
-    }
-    @PostMapping("/register")
-    public User register(@RequestBody User us) {
-    	us.setPassword(passwordEncoder.encode(us.getPassword()));
-    	userrepo.save(us);
-    	return userrepo.findByUsername(us.getUsername());
-    }
-    // Api /api/random yêu cầu phải xác thực mới có thể request
-    @GetMapping("/random")
-    public RandomStuff randomStuff(){
-        return new RandomStuff("JWT Hợp lệ mới có thể thấy được message này");
-    }
+		// Xác thực thông tin người dùng Request lên
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+		// Nếu không xảy ra exception tức là thông tin hợp lệ
+		// Set thông tin authentication vào Security Context
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+
+		// Trả về jwt cho người dùng.
+		String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
+		return new LoginResponse(jwt);
+	}
+
+	@PostMapping("/register")
+	public User register(@RequestBody User us) {
+		us.setPassword(passwordEncoder.encode(us.getPassword()));
+		us.setRole("USER");
+		userrepo.save(us);
+		return userrepo.findByUsername(us.getUsername());
+	}
+
+	// Api /api/random yêu cầu phải xác thực mới có thể request
+	@GetMapping("/random")
+	public RandomStuff randomStuff() {
+		return new RandomStuff("JWT Hợp lệ mới có thể thấy được message này");
+	}
+
+	@GetMapping("/403")
+	public String denied() {
+		return "Not permistion";
+	}
+	
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/admin")
+	public String admin() {
+		return "Welcome to admin";
+	}
 
 }

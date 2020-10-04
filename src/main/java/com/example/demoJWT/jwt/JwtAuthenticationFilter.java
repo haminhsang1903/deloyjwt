@@ -1,4 +1,5 @@
 package com.example.demoJWT.jwt;
+
 /*******************************************************
  * For Vietnamese readers:
  *    Các bạn thân mến, mình rất vui nếu project này giúp 
@@ -25,54 +26,50 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.demoJWT.user.UserService;
 
-
 /**
- * Copyright 2019 {@author Loda} (https://loda.me).
- * This project is licensed under the MIT license.
+ * Copyright 2019 {@author Loda} (https://loda.me). This project is licensed
+ * under the MIT license.
  *
- * @since 5/1/2019
- * Github: https://github.com/loda-kun
+ * @since 5/1/2019 Github: https://github.com/loda-kun
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+	@Autowired
+	private JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private UserService customUserDetailsService;
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        try {
-            String jwt = getJwtFromRequest(request);
+	@Autowired
+	private UserService customUserDetailsService;
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                Long userId = tokenProvider.getUserIdFromJWT(jwt);
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		try {
+			String jwt = getJwtFromRequest(request);
 
-                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-                if(userDetails != null) {
-                    UsernamePasswordAuthenticationToken
-                            authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                                                                                     userDetails
-                                                                                             .getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+				String userId = tokenProvider.getUserIdFromJWT(jwt);
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            }
-        } catch (Exception ex) {
+				UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+				if (userDetails != null) {
+					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+							userDetails, null, userDetails.getAuthorities());
+					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+				}
+			}
+		} catch (Exception ex) {
 //            log.error("failed on set user authentication", ex);
-        }
+		}
 
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        // Kiểm tra xem header Authorization có chứa thông tin jwt không
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
+	private String getJwtFromRequest(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7);
+		}
+		return null;
+	}
 }

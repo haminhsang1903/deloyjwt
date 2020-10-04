@@ -10,6 +10,7 @@ package com.example.demoJWT.user;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,6 +30,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Mặc định mình sẽ để tất cả là ROLE_USER. Để demo cho đơn giản.
+    	
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
     }
 

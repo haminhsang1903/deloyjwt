@@ -1,4 +1,5 @@
 package com.example.demoJWT.user;
+
 /*******************************************************
  * For Vietnamese readers:
  *    Các bạn thân mến, mình rất vui nếu project này giúp 
@@ -14,35 +15,24 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
-
 /**
- * Copyright 2019 {@author Loda} (https://loda.me).
- * This project is licensed under the MIT license.
+ * Copyright 2019 {@author Loda} (https://loda.me). This project is licensed
+ * under the MIT license.
  *
- * @since 4/30/2019
- * Github: https://github.com/loda-kun
+ * @since 4/30/2019 Github: https://github.com/loda-kun
  */
 @Entity
 @Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue
-    private Long id;
+	@Id
+	@Column(nullable = false, unique = true)
+	private String username;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-    
-    @Column(nullable = false, unique = true)
-    private String password;
+	@Column(nullable = false, unique = true)
+	private String password;
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	@Column(nullable = false, unique = true)
+	private String role;
 
 	public String getUsername() {
 		return username;
@@ -60,15 +50,23 @@ public class User {
 		this.password = password;
 	}
 
-	public User(Long id, String username, String password) {
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public User(String username, String password, String role) {
 		super();
-		this.id = id;
 		this.username = username;
 		this.password = password;
+		this.role = role;
 	}
 
 	public User() {
 		super();
 	}
-    
+
 }

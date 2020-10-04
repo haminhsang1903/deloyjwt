@@ -73,11 +73,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers("/api/login").permitAll() // Cho phép tất cả mọi người truy cập vào 2 địa chỉ này
                     .antMatchers("/api/register").permitAll()
+                    .antMatchers("/api/").permitAll()
+                    .antMatchers("/api/admin").hasRole("ADMIN")
                     .anyRequest().authenticated()
                  .and()
                  .logout(); // Tất cả các request khác đều cần phải xác thực mới được truy cập
         		
-
+        http.exceptionHandling().accessDeniedPage("/403");
         // Thêm một lớp Filter kiểm tra jwt
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

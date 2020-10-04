@@ -36,12 +36,13 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
+        System.out.println("here");
         return new CustomUserDetails(user);
     }
 
     // JWTAuthenticationFilter sẽ sử dụng hàm này
     @Transactional
-    public UserDetails loadUserById(Long id) {
+    public UserDetails loadUserById(String id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with id : " + id)
         );

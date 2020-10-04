@@ -19,6 +19,6 @@ import org.springframework.stereotype.Repository;
  * Github: https://github.com/loda-kun
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
     User findByUsername(String username);
 }
