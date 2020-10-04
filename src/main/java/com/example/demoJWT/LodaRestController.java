@@ -71,9 +71,8 @@ public class LodaRestController {
 	}
 
 	@PostMapping("/register")
-	public User register(@RequestBody User us) {
-		us.setPassword(passwordEncoder.encode(us.getPassword()));
-		us.setRole("USER");
+	public User register(@RequestBody LoginRequest us1) {
+		User us  = new User(us1.getUsername(),passwordEncoder.encode(us1.getPassword()) ,"USER");
 		userrepo.save(us);
 		return userrepo.findByUsername(us.getUsername());
 	}
